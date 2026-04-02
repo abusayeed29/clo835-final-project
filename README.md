@@ -39,3 +39,15 @@ export APP_COLOR=blue
 ```
 ### Run the application, make sure it is visible in the browser
 ```docker run -p 8080:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD  my_app```
+
+## Additional endpoints and behavior
+- GET `/health` returns JSON: `{ "status": "ok" }` for application liveness checks.
+- POST `/addemp` inserts employee in MySQL.
+- POST `/getemp` renders employee lookup form.
+- POST `/fetchdata` returns fetched employee data or shows "No employee found" message.
+
+## Notes
+- `DBPORT` default is `3306` if not set.
+- If `APP_COLOR` is not set, default background color is `lime`.
+- SQL uses parameterized queries to avoid injection.
+
