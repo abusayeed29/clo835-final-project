@@ -1,0 +1,22 @@
+aws_region           = "us-east-1"
+project_name         = "clo835"
+environment          = "final"
+cluster_name         = "clo835-cluster"
+kubernetes_version   = "1.29"
+node_group_name      = "final-workers"
+node_instance_types  = ["t3.medium"]
+desired_size         = 2
+min_size             = 1
+max_size             = 3
+app_repo_name        = "clo835-app"
+mysql_repo_name      = "clo835-mysql"
+bucket_name          = "replace-with-your-unique-bucket-name"
+namespace            = "final"
+service_account_name = "clo835"
+force_destroy_bucket = true
+
+tags = {
+  Owner      = "Md Abu Sayeed"
+  Course     = "CLO835"
+  Assignment = "Final Project"
+}
