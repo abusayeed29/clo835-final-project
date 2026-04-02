@@ -10,7 +10,7 @@ locals {
 }
 
 module "ecr" {
-  source = "./modules/ecr"
+  source = "../modules/ecr"
 
   app_repo_name   = var.app_repo_name
   mysql_repo_name = var.mysql_repo_name
@@ -18,7 +18,7 @@ module "ecr" {
 }
 
 module "s3" {
-  source = "./modules/s3"
+  source = "../modules/s3"
 
   bucket_name   = var.bucket_name
   force_destroy = var.force_destroy_bucket
@@ -26,7 +26,7 @@ module "s3" {
 }
 
 module "eks" {
-  source = "./modules/eks"
+  source = "../modules/eks"
 
   cluster_name        = var.cluster_name
   kubernetes_version  = var.kubernetes_version
@@ -39,7 +39,7 @@ module "eks" {
 }
 
 module "irsa" {
-  source = "./modules/irsa"
+  source = "../modules/irsa"
 
   cluster_name         = module.eks.cluster_name
   oidc_provider_arn    = module.eks.oidc_provider_arn
