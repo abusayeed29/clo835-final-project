@@ -6,7 +6,7 @@ metadata:
 data:
   APP_COLOR: "pink"
   AWS_REGION: "us-east-1"
-  MY_NAME: "Md Abu Sayeed"
+  MY_NAME: "MD Abu Sayeed | RAZA"
   BG_IMAGE_URL: "s3://your-private-s3-bucket/background.jpg"
   DBHOST: "mysql"
   DBPORT: "3306"
