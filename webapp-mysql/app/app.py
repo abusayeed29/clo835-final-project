@@ -9,10 +9,10 @@ app = Flask(__name__)
 
 DBHOST = os.environ.get("DBHOST") or "localhost"
 DBUSER = os.environ.get("DBUSER") or "root"
-DBPWD = os.environ.get("DBPWD") or "passwors"
+DBPWD = os.environ.get("DBPWD") or "password"
 DATABASE = os.environ.get("DATABASE") or "employees"
 COLOR_FROM_ENV = os.environ.get('APP_COLOR') or "lime"
-DBPORT = int(os.environ.get("DBPORT"))
+DBPORT = int(os.environ.get("DBPORT") or 3306)
 
 # Create a connection to the MySQL database
 db_conn = connections.Connection(
@@ -24,7 +24,7 @@ db_conn = connections.Connection(
     
 )
 output = {}
-table = 'employee';
+table = 'employee'
 
 # Define the supported color codes
 color_codes = {
@@ -91,24 +91,33 @@ def FetchData():
     cursor = db_conn.cursor()
 
     try:
-        cursor.execute(select_sql,(emp_id))
+        cursor.execute(select_sql, (emp_id,))
         result = cursor.fetchone()
-        
-        # Add No Employee found form
+
+        if result is None:
+            return render_template("getempoutput.html", id="N/A", fname="N/A",
+                                   lname="N/A", interest="N/A", location="N/A",
+                                   color=color_codes[COLOR], message="No employee found")
+
         output["emp_id"] = result[0]
         output["first_name"] = result[1]
         output["last_name"] = result[2]
         output["primary_skills"] = result[3]
         output["location"] = result[4]
-        
+
     except Exception as e:
         print(e)
+        return "Error fetching data", 500
 
     finally:
         cursor.close()
 
     return render_template("getempoutput.html", id=output["emp_id"], fname=output["first_name"],
                            lname=output["last_name"], interest=output["primary_skills"], location=output["location"], color=color_codes[COLOR])
+
+@app.route("/health", methods=['GET'])
+def health():
+    return {"status": "ok"}, 200
 
 if __name__ == '__main__':
     
