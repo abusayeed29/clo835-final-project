@@ -7,55 +7,53 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY_APP: clo835-flask-app
+  ECR_REPOSITORY_APP: clo835-app
   ECR_REPOSITORY_DB: clo835-mysql
 
 jobs:
-
   build-and-push:
     name: Build and Push Docker Images
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    # 🔥 FIXED AWS AUTH (with session token)
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Login to Amazon ECR
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build Flask App Image
-      run: |
-        docker build -t $ECR_REPOSITORY_APP:latest ./webapp-mysql/app
+      - name: Build Flask app image
+        run: |
+          docker build -t $ECR_REPOSITORY_APP:latest ./webapp-mysql/app
 
-    - name: Tag Flask Image
-      run: |
-        docker tag $ECR_REPOSITORY_APP:latest \
-        ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_APP:latest
+      - name: Tag Flask app image
+        run: |
+          docker tag $ECR_REPOSITORY_APP:latest \
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_APP:latest
 
-    - name: Push Flask Image
-      run: |
-        docker push \
-        ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_APP:latest
+      - name: Push Flask app image
+        run: |
+          docker push \
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_APP:latest
 
-    - name: Build MySQL Image
-      run: |
-        docker build -t $ECR_REPOSITORY_DB:latest ./webapp-mysql/mysql
+      - name: Build MySQL image
+        run: |
+          docker build -t $ECR_REPOSITORY_DB:latest ./webapp-mysql/mysql
 
-    - name: Tag MySQL Image
-      run: |
-        docker tag $ECR_REPOSITORY_DB:latest \
-        ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_DB:latest
+      - name: Tag MySQL image
+        run: |
+          docker tag $ECR_REPOSITORY_DB:latest \
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_DB:latest
 
-    - name: Push MySQL Image
-      run: |
-        docker push \
-        ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_DB:latest
+      - name: Push MySQL image
+        run: |
+          docker push \
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_DB:latest

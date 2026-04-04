@@ -16,7 +16,7 @@ spec:
       serviceAccountName: clo835
       containers:
         - name: webapp
-          image: YOUR_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/clo835-app:latest
+          image: 711113761458.dkr.ecr.us-east-1.amazonaws.com/clo835-app:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 81

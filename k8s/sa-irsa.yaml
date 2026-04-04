@@ -4,4 +4,4 @@ metadata:
   name: clo835
   namespace: final
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/clo835-final-irsa-clo835
+    eks.amazonaws.com/role-arn: arn:aws:iam::711113761458:role/clo835-final-irsa-clo835
