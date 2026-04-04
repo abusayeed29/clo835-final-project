@@ -1,4 +1,4 @@
-name: Deploy app to AWS via Terraform + EKS ECR
+name: Deploy app to AWS via Terraform + EKS + ECR
 
 on:
   push:
@@ -8,76 +8,99 @@ env:
   IMAGE_TAG: latest
 
 jobs:
+
   terraform:
-    name: Terraform provisioning
+    name: Terraform Provisioning
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - uses: aws-actions/configure-aws-credentials@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Configure AWS CLI
+      - name: Terraform Init
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          cd terraform
+          terraform init
 
-      - name: Build and push app image
+      - name: Terraform Apply
+        run: |
+          cd terraform
+          terraform apply -auto-approve
+
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: terraform   # ✅ runs after terraform
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
+          | docker login --username AWS --password-stdin \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+      - name: Build & Push App Image
         run: |
           docker build -t clo835-app:${{ env.IMAGE_TAG }} ./webapp-mysql/app
-          docker tag clo835-app:${{ env.IMAGE_TAG }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/clo835-app:${{ env.IMAGE_TAG }}
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/clo835-app:${{ env.IMAGE_TAG }}
+          docker tag clo835-app:${{ env.IMAGE_TAG }} \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/clo835-app:${{ env.IMAGE_TAG }}
+          docker push \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/clo835-app:${{ env.IMAGE_TAG }}
 
-      - name: Build and push mysql image
+      - name: Build & Push MySQL Image
         run: |
           docker build -t clo835-mysql:${{ env.IMAGE_TAG }} ./webapp-mysql/mysql
-          docker tag clo835-mysql:${{ env.IMAGE_TAG }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/clo835-mysql:${{ env.IMAGE_TAG }}
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/clo835-mysql:${{ env.IMAGE_TAG }}
+          docker tag clo835-mysql:${{ env.IMAGE_TAG }} \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/clo835-mysql:${{ env.IMAGE_TAG }}
+          docker push \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/clo835-mysql:${{ env.IMAGE_TAG }}
 
   deploy-k8s:
     name: Deploy to EKS
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: build-and-push   # ✅ fixed
 
     steps:
       - uses: actions/checkout@v3
 
-      - uses: aws-actions/configure-aws-credentials@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: '1.29.0'
-
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+          aws eks update-kubeconfig --name clo835 --region ${{ secrets.AWS_REGION }}
 
-      - name: Apply Kubernetes manifests
+      - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/configmap.yaml
-          kubectl apply -f k8s/secret.yaml
-          kubectl apply -f k8s/mysql-deployment.yaml
-          kubectl apply -f k8s/mysql-service.yaml
-          kubectl apply -f k8s/app-deployment.yaml
-          kubectl apply -f k8s/app-service.yaml
-          kubectl apply -f k8s/hpa.yaml
+          kubectl apply -f k8s/
 
   smoke-test:
-    name: Smoke test deployed application
+    name: Smoke Test
     runs-on: ubuntu-latest
-    needs: deploy-k8s
+    needs: deploy-k8s   # ✅ no cycle now
 
     steps:
-      - name: Print service status
+      - name: Test App
         run: |
-          kubectl get pods --all-namespaces
-          kubectl get svc --all-namespaces
+          echo "Testing deployment..."
+          kubectl get pods
