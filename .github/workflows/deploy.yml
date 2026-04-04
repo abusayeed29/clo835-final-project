@@ -1,4 +1,4 @@
-name: Deploy app to AWS via Terraform + EKS + ECR
+name: Deploy app to AWS via Terraform + EKS ECR
 
 on:
   push:
