@@ -1,0 +1,11 @@
+docker run -p 81:81 \
+  -e APP_AUTHOR="Md Abu Sayeed" \
+  -e BG_IMAGE_URL="s3://clo835-finalproject-711113761458/bg-image.jpg" \
+  -e DBHOST="localhost" \
+  -e DBPORT="3306" \
+  -e DBUSER="root" \
+  -e DBPWD="password" \
+  -e DATABASE="employees" \
+  clo835-app:local
+  
+  
