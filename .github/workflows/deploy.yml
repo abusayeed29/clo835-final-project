@@ -46,20 +46,3 @@ jobs:
         run: |
           docker push \
             ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_APP:latest
-
-      - name: Build MySQL image
-        run: |
-          docker build \
-            -t $ECR_REPOSITORY_DB:latest \
-            -f ./webapp-mysql/mysql/Dockerfile \
-            ./webapp-mysql/mysql
-
-      - name: Tag MySQL image
-        run: |
-          docker tag $ECR_REPOSITORY_DB:latest \
-            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_DB:latest
-
-      - name: Push MySQL image
-        run: |
-          docker push \
-            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY_DB:latest
