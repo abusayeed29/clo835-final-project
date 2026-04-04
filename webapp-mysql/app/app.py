@@ -12,6 +12,7 @@ DBUSER = os.environ.get("DBUSER") or "root"
 DBPWD = os.environ.get("DBPWD") or "password"
 DATABASE = os.environ.get("DATABASE") or "employees"
 COLOR_FROM_ENV = os.environ.get('APP_COLOR') or "lime"
+BG_IMAGE_URL = os.environ.get("BG_IMAGE_URL") or ""
 DBPORT = int(os.environ.get("DBPORT") or 3306)
 
 # Create a connection to the MySQL database
@@ -47,11 +48,11 @@ COLOR = random.choice(["red", "green", "blue", "blue2", "darkblue", "pink", "lim
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
-    return render_template('addemp.html', color=color_codes[COLOR])
+    return render_template('addemp.html', color=color_codes[COLOR], bg_image=BG_IMAGE_URL)
 
 @app.route("/about", methods=['GET','POST'])
 def about():
-    return render_template('about.html', color=color_codes[COLOR])
+    return render_template('about.html', color=color_codes[COLOR], bg_image=BG_IMAGE_URL)
     
 @app.route("/addemp", methods=['POST'])
 def AddEmp():
@@ -75,11 +76,11 @@ def AddEmp():
         cursor.close()
 
     print("all modification done...")
-    return render_template('addempoutput.html', name=emp_name, color=color_codes[COLOR])
+    return render_template('addempoutput.html', name=emp_name, color=color_codes[COLOR], bg_image=BG_IMAGE_URL)
 
 @app.route("/getemp", methods=['GET', 'POST'])
 def GetEmp():
-    return render_template("getemp.html", color=color_codes[COLOR])
+    return render_template("getemp.html", color=color_codes[COLOR], bg_image=BG_IMAGE_URL)
 
 
 @app.route("/fetchdata", methods=['GET','POST'])
@@ -97,7 +98,7 @@ def FetchData():
         if result is None:
             return render_template("getempoutput.html", id="N/A", fname="N/A",
                                    lname="N/A", interest="N/A", location="N/A",
-                                   color=color_codes[COLOR], message="No employee found")
+                                   color=color_codes[COLOR], bg_image=BG_IMAGE_URL, message="No employee found")
 
         output["emp_id"] = result[0]
         output["first_name"] = result[1]
@@ -113,7 +114,7 @@ def FetchData():
         cursor.close()
 
     return render_template("getempoutput.html", id=output["emp_id"], fname=output["first_name"],
-                           lname=output["last_name"], interest=output["primary_skills"], location=output["location"], color=color_codes[COLOR])
+                           lname=output["last_name"], interest=output["primary_skills"], location=output["location"], color=color_codes[COLOR], bg_image=BG_IMAGE_URL)
 
 @app.route("/health", methods=['GET'])
 def health():
