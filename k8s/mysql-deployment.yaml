@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: 711113761458.dkr.ecr.us-east-1.amazonaws.com/clo835-mysql:latest
-          imagePullPolicy: Always
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3306
           env:
@@ -33,7 +33,16 @@ spec:
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
+            - name: mysql-init
+              mountPath: /docker-entrypoint-initdb.d/mysql-init.sql
+              subPath: mysql-init.sql
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
             claimName: mysql-pvc
+        - name: mysql-init
+          configMap:
+            name: app-config
+            items:
+              - key: mysql-init.sql
+                path: mysql-init.sql
