@@ -2,12 +2,24 @@
 <html>
 <head>
 	<title>Add Employee Information</title>
+	<style>
+		body {
+			{% if bg_image %}
+			background-image: url('{{ bg_image }}');
+			background-size: cover;
+			background-attachment: fixed;
+			background-position: center;
+			{% else %}
+			background-color: {{ color }};
+			{% endif %}
+		}
+	</style>
 </head>
 <center>
 	<font color="black" size="4" style="font-family: avenir">
 
 		<h1 style="color: DodgerBlue">Employee Database</h1>
-		<body style="background: {{ color }};" >
+		<body>
 
 			<form action="/addemp" autocomplete="on" method = "POST" enctype="multipart/form-data">
 

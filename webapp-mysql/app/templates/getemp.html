@@ -2,13 +2,25 @@
 <html>
 <head>
 	<title>Get Employee Information</title>
+	<style>
+		body {
+			{% if bg_image %}
+			background-image: url('{{ bg_image }}');
+			background-size: cover;
+			background-attachment: fixed;
+			background-position: center;
+			{% else %}
+			background-color: {{ color }};
+			{% endif %}
+		}
+	</style>
 </head>
 <center>
 	<font color="black" size="5" style="font-family: avenir">
 
 		<h1 style="color: DodgerBlue">Employee Information</h1>
 
-		<body style="background: {{ color }};">
+		<body>
 
 			<form action="/fetchdata" autocomplete="on" method="POST">
 
