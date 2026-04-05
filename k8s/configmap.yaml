@@ -7,7 +7,7 @@ data:
   APP_COLOR: "pink"
   AWS_REGION: "us-east-1"
   MY_NAME: "MD Abu Sayeed | RAZA"
-  BG_IMAGE_URL: "https://clo835-finalproject-711113761458.s3.amazonaws.com/bg-image.jpg"
+  BG_IMAGE_URL: "s3://clo835-finalproject-711113761458/bg-image.jpg"
   DBHOST: "mysql"
   DBPORT: "3306"
   DATABASE: "employees"
