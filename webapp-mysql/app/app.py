@@ -12,26 +12,7 @@ DBUSER = os.environ.get("DBUSER") or "root"
 DBPWD = os.environ.get("DBPWD") or "password"
 DATABASE = os.environ.get("DATABASE") or "employees"
 COLOR_FROM_ENV = os.environ.get('APP_COLOR') or "lime"
-
-
-def normalize_bg_image_url(url: str, region: str) -> str:
-    if not url:
-        return ""
-    url = url.strip()
-    if url.startswith("s3://"):
-        _, rest = url.split("s3://", 1)
-        if "/" not in rest:
-            return ""
-        bucket, key = rest.split("/", 1)
-        if region == "us-east-1":
-            return f"https://{bucket}.s3.amazonaws.com/{key}"
-        return f"https://{bucket}.s3.{region}.amazonaws.com/{key}"
-    return url
-
-BG_IMAGE_URL = normalize_bg_image_url(
-    os.environ.get("BG_IMAGE_URL") or "",
-    os.environ.get("AWS_REGION") or "us-east-1"
-)
+BG_IMAGE_URL = os.environ.get("BG_IMAGE_URL") or ""
 DBPORT = int(os.environ.get("DBPORT") or 3306)
 
 # Create a connection to the MySQL database
